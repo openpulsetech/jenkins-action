@@ -8,11 +8,9 @@ This Jenkins action performs comprehensive security scanning including:
 
 ## Prerequisites
 
-1. Jenkins server with Node.js installed
-2. The following tools need to be installed on Jenkins agents:
-   - cdxgen (npm install -g @cyclonedx/cdxgen)
-   - Trivy (https://aquasecurity.github.io/trivy/)
-   - Gitleaks (https://github.com/gitleaks/gitleaks)
+1. Jenkins server with Docker support
+2. Docker image: `neotrak/sbom-base:1.0.5` (contains cdxgen, Trivy, and Gitleaks pre-installed)
+3. No additional tool installation required - everything runs inside the Docker container
 
 ## Setup
 
@@ -67,11 +65,38 @@ Copy the `Jenkinsfile` from this repository to the root of your project reposito
 
 Simply add the Jenkinsfile to your repository and create a Jenkins Pipeline job pointing to your repository. The scanner will run automatically on each build.
 
-### Manual Execution
+### Manual Execution with Docker
 
-You can also run the scanner manually:
+You can also run the scanner manually using Docker:
 
 ```bash
+# Set required environment variables
+export NT_API_KEY="your-api-key"
+export NT_SECRET_KEY="your-secret-key"
+export NT_API_ENDPOINT="https://beta.neoTrak.io"
+export PROJECT_ID="your-project-id"
+export ORGANIZATION_ID="your-org-id"
+
+# Run the scanner in Docker container
+docker run --rm \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  -e NT_API_KEY="${NT_API_KEY}" \
+  -e NT_SECRET_KEY="${NT_SECRET_KEY}" \
+  -e NT_API_ENDPOINT="${NT_API_ENDPOINT}" \
+  -e PROJECT_ID="${PROJECT_ID}" \
+  -e ORGANIZATION_ID="${ORGANIZATION_ID}" \
+  -e WORKSPACE=$(pwd) \
+  neotrak/sbom-base:1.0.5 \
+  node jenkins-action/scanner/main.js
+```
+
+### Manual Execution without Docker
+
+If you prefer to run without Docker:
+
+```bash
+# Install required tools: cdxgen, trivy, gitleaks
 # Set required environment variables
 export NT_API_KEY="your-api-key"
 export NT_SECRET_KEY="your-secret-key"
@@ -128,14 +153,22 @@ Set `DEBUG_MODE=true` in the Jenkinsfile to see detailed logging including:
 
 If the scan fails, check the Jenkins console output for detailed error messages.
 
-### Verify Tool Installations
+### Verify Docker Image
 
-Ensure all required tools are properly installed on the Jenkins agent:
+Ensure the Docker image is accessible:
 
 ```bash
-cdxgen --version
-trivy --version
-gitleaks version
+docker pull neotrak/sbom-base:1.0.5
+docker run --rm neotrak/sbom-base:1.0.5 sh -c "cdxgen --version && trivy --version && gitleaks version"
+```
+
+### Docker Permissions
+
+Make sure the Jenkins user has permissions to run Docker commands. You may need to add the Jenkins user to the docker group:
+
+```bash
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
 ```
 
 ## File Structure

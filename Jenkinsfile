@@ -14,10 +14,6 @@ pipeline {
         FAIL_ON_VULNERABILITY = 'true'
         FAIL_ON_SECRET = 'true'
         DEBUG_MODE = 'false'
-
-        // Node.js version
-        NODEJS_HOME = tool name: 'NodeJS', type: 'NodeJSInstallation'
-        PATH = "${NODEJS_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -28,50 +24,39 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Run Security Scans in Docker') {
             steps {
-                echo 'Installing cdxgen, trivy, and gitleaks...'
-                sh '''
-                    # Install cdxgen globally
-                    npm install -g @cyclonedx/cdxgen
+                script {
+                    echo 'Running SBOM and security scans inside Docker container...'
 
-                    # Install Trivy (if not already installed)
-                    if ! command -v trivy &> /dev/null; then
-                        echo "Installing Trivy..."
-                        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-                        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-                        sudo apt-get update
-                        sudo apt-get install trivy -y
-                    fi
+                    docker.image('neotrak/sbom-base:1.0.5').inside("-v ${WORKSPACE}:${WORKSPACE} -w ${WORKSPACE}") {
+                        sh '''
+                            echo "Running inside neotrak/sbom-base:1.0.5 container"
 
-                    # Install Gitleaks (if not already installed)
-                    if ! command -v gitleaks &> /dev/null; then
-                        echo "Installing Gitleaks..."
-                        wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
-                        tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
-                        sudo mv gitleaks /usr/local/bin/
-                        rm gitleaks_8.18.0_linux_x64.tar.gz
-                    fi
+                            # Verify tools are available
+                            echo "Verifying installations..."
+                            trivy --version
+                            cdxgen --version
+                            gitleaks version
 
-                    # Verify installations
-                    cdxgen --version
-                    trivy --version
-                    gitleaks version
-                '''
-            }
-        }
+                            # Copy scanner scripts to workspace if not already present
+                            if [ ! -d "scanner" ]; then
+                                cp -r jenkins-action/scanner .
+                            fi
 
-        stage('Run Security Scans') {
-            steps {
-                echo 'Running SBOM and security scans...'
-                dir("${WORKSPACE}") {
-                    sh '''
-                        # Copy scanner scripts to workspace
-                        cp -r jenkins-action/scanner .
+                            # Set environment variables for the scanner
+                            export WORKSPACE=${WORKSPACE}
+                            export BUILD_ID=${BUILD_ID}
+                            export BUILD_NUMBER=${BUILD_NUMBER}
+                            export JOB_NAME=${JOB_NAME}
+                            export GIT_BRANCH=${GIT_BRANCH}
+                            export GIT_URL=${GIT_URL}
 
-                        # Run the main scanner script
-                        node scanner/main.js
-                    '''
+                            # Run the main scanner script
+                            node scanner/main.js
+                        '''
+                    }
+                    // Container is automatically cleaned up after 'inside' block
                 }
             }
         }
