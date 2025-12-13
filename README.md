@@ -44,7 +44,10 @@ Add the following credentials in Jenkins (Manage Jenkins > Credentials):
 | `FAIL_ON_MISCONFIGURATION` | Fail the pipeline if misconfigurations are found | `false` | `true` or `false` |
 | `FAIL_ON_SECRET` | Fail the pipeline if secrets are detected | `false` | `true` or `false` |
 
-**Note:** All failure flags default to `false` (non-blocking). Set them to `true` if you want the pipeline to fail when issues are found.
+**Note:** All failure flags are **optional** and default to `false` (non-blocking). You can:
+- **Omit them entirely** - scanner will use default `false` behavior (non-blocking)
+- **Explicitly set to `false`** - same as omitting them (non-blocking)
+- **Set to `true`** - pipeline will fail when issues are found (blocking)
 
 ### Step 2: Add NeoTrack Scan to Your Jenkins Pipeline
 
@@ -57,9 +60,6 @@ pipeline {
     environment {
         NT_API_KEY = credentials('NT_API_KEY')
         NT_SECRET_KEY = credentials('NT_SECRET_KEY')
-        FAIL_ON_MISCONFIGURATION = 'false'  // Set to false to not fail the build
-        FAIL_ON_VULNERABILITY = 'false'     // Set to false to not fail the build
-        FAIL_ON_SECRET = 'false'            // Set to false to not fail the build
     }
 
     stages {
@@ -114,7 +114,7 @@ pipeline {
 
 If you already have a `Jenkinsfile` in your project, you can add the NeoTrack Security Scan as an additional stage:
 
-**Option 1: Add as a parallel stage**
+**Option 1: Add as a parallel stage (non-blocking by default)**
 
 ```groovy
 pipeline {
@@ -123,9 +123,6 @@ pipeline {
     environment {
         NT_API_KEY = credentials('NT_API_KEY')
         NT_SECRET_KEY = credentials('NT_SECRET_KEY')
-        FAIL_ON_MISCONFIGURATION = 'false'
-        FAIL_ON_VULNERABILITY = 'false'
-        FAIL_ON_SECRET = 'false'
     }
 
     stages {
@@ -220,7 +217,7 @@ pipeline {
 }
 ```
 
-**Option 3: Scan only on specific branches**
+**Option 3: Scan only on specific branches (non-blocking by default)**
 
 ```groovy
 pipeline {
@@ -229,9 +226,6 @@ pipeline {
     environment {
         NT_API_KEY = credentials('NT_API_KEY')
         NT_SECRET_KEY = credentials('NT_SECRET_KEY')
-        FAIL_ON_MISCONFIGURATION = 'false'
-        FAIL_ON_VULNERABILITY = 'false'
-        FAIL_ON_SECRET = 'false'
     }
 
     stages {
@@ -273,9 +267,9 @@ pipeline {
 **Best Practices:**
 
 1. **Separate Stage** - Run security scans in a dedicated stage for better organization
-2. **Before Deployment** - Always scan before deploying to production with `FAIL_ON_*=true`
-3. **Fail on Production** - Set `FAIL_ON_VULNERABILITY=true` for main/production branches
-4. **Non-blocking for Development** - Set flags to `false` for development branches to avoid blocking developers
+2. **Before Deployment** - Always scan before deploying to production with `FAIL_ON_*='true'`
+3. **Fail on Production** - Set `FAIL_ON_VULNERABILITY='true'` for main/production branches
+4. **Non-blocking for Development** - Omit `FAIL_ON_*` variables (or set to `'false'`) for development branches to avoid blocking developers
 5. **Archive Artifacts** - Always archive scan reports for later review and compliance
 
 ## Configuration Options
@@ -301,13 +295,21 @@ The following environment variables are configured through Jenkins credentials:
 #### Optional Variables (Environment in Jenkinsfile)
 
 - **`FAIL_ON_VULNERABILITY`**: Fail pipeline on vulnerabilities (default: `false`)
-  - Set in Jenkinsfile environment: `FAIL_ON_VULNERABILITY = 'true'` to enable blocking
-- **`FAIL_ON_MISCONFIGURATION`**: Fail pipeline on misconfigurations (default: `false`)
-  - Set in Jenkinsfile environment: `FAIL_ON_MISCONFIGURATION = 'true'` to enable blocking
-- **`FAIL_ON_SECRET`**: Fail pipeline on secret detection (default: `false`)
-  - Set in Jenkinsfile environment: `FAIL_ON_SECRET = 'true'` to enable blocking
+  - **Optional** - can be omitted or explicitly set
+  - Set to `'true'` to enable blocking: `FAIL_ON_VULNERABILITY = 'true'`
+  - Set to `'false'` or omit for non-blocking: `FAIL_ON_VULNERABILITY = 'false'` (or don't declare it)
 
-**Note:** By default, all scans are **non-blocking** (report only). Set variables to `true` if you want the pipeline to fail when issues are found.
+- **`FAIL_ON_MISCONFIGURATION`**: Fail pipeline on misconfigurations (default: `false`)
+  - **Optional** - can be omitted or explicitly set
+  - Set to `'true'` to enable blocking: `FAIL_ON_MISCONFIGURATION = 'true'`
+  - Set to `'false'` or omit for non-blocking: `FAIL_ON_MISCONFIGURATION = 'false'` (or don't declare it)
+
+- **`FAIL_ON_SECRET`**: Fail pipeline on secret detection (default: `false`)
+  - **Optional** - can be omitted or explicitly set
+  - Set to `'true'` to enable blocking: `FAIL_ON_SECRET = 'true'`
+  - Set to `'false'` or omit for non-blocking: `FAIL_ON_SECRET = 'false'` (or don't declare it)
+
+**Note:** By default, all scans are **non-blocking** (report only). You can choose to omit these variables entirely, explicitly set them to `'false'`, or set them to `'true'` to fail the pipeline when issues are found.
 
 ### Jenkins Environment Variables (Automatically Available)
 
@@ -396,7 +398,7 @@ pipeline {
 }
 ```
 
-### Example 2: Scheduled Security Scans
+### Example 2: Scheduled Security Scans (Non-blocking)
 
 Run security scans on a schedule:
 
@@ -411,10 +413,6 @@ pipeline {
     environment {
         NT_API_KEY = credentials('NT_API_KEY')
         NT_SECRET_KEY = credentials('NT_SECRET_KEY')
-        // Non-blocking for scheduled scans
-        FAIL_ON_MISCONFIGURATION = 'false'
-        FAIL_ON_VULNERABILITY = 'false'
-        FAIL_ON_SECRET = 'false'
     }
 
     stages {
