@@ -10,9 +10,9 @@ const { processAndSendReports } = require('./apiService');
 
 // Configuration variables from environment (with defaults)
 const debug = process.env.DEBUG_MODE === 'true' || false;
-const fail_on_misconfiguration = process.env.FAIL_ON_MISCONFIGURATION !== 'false'; // default true
-const fail_on_vulnerability = process.env.FAIL_ON_VULNERABILITY !== 'false'; // default true
-const fail_on_secret = process.env.FAIL_ON_SECRET !== 'false'; // default true
+const fail_on_misconfiguration = process.env.FAIL_ON_MISCONFIGURATION === 'true' || false; // default false
+const fail_on_vulnerability = process.env.FAIL_ON_VULNERABILITY === 'true' || false; // default false
+const fail_on_secret = process.env.FAIL_ON_SECRET === 'true' || false; // default false
 
 if (debug) {
   console.log('Starting SBOM scan of test-project source code');
