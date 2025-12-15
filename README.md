@@ -24,12 +24,36 @@ Before using this integration, you need to:
 
 ### Step 1: Configure Jenkins Credentials
 
-Add the following credentials in Jenkins (Manage Jenkins > Credentials):
+Add the following credentials in Jenkins by following these steps:
 
-1. Go to **Manage Jenkins** → **Manage Credentials**
-2. Select your credential store and domain
-3. Click **Add Credentials**
-4. Add the following credentials:
+#### Detailed Steps to Add Credentials:
+
+1. Navigate to **Manage Jenkins** from the Jenkins dashboard
+2. Click on **Credentials** (formerly "Manage Credentials")
+3. Select **System** from the left sidebar
+4. Click on **Global credentials (unrestricted)**
+5. Click **Add Credentials** button (or **+ Add Credentials**)
+
+#### For NT_API_KEY:
+
+6. Fill in the following details:
+   - **Kind**: Select "Secret text" from the dropdown
+   - **Scope**: Global (Jenkins, nodes, items, all child items, etc.)
+   - **Secret**: Paste your NeoTrack API key here
+   - **ID**: `NT_API_KEY` (this must match exactly as it's referenced in the pipeline)
+   - **Description**: NeoTrack API Key (optional but recommended)
+7. Click **Create** or **OK** to save
+
+#### For NT_SECRET_KEY:
+
+8. Click **Add Credentials** again
+9. Fill in the following details:
+   - **Kind**: Select "Secret text" from the dropdown
+   - **Scope**: Global (Jenkins, nodes, items, all child items, etc.)
+   - **Secret**: Paste your NeoTrack secret key here
+   - **ID**: `NT_SECRET_KEY` (this must match exactly as it's referenced in the pipeline)
+   - **Description**: NeoTrack Secret Key (optional but recommended)
+10. Click **Create** or **OK** to save
 
 | Credential ID | Type | Description | Required |
 |---------------|------|-------------|----------|
@@ -70,7 +94,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
             }
@@ -101,7 +125,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
             }
@@ -147,7 +171,7 @@ pipeline {
                         }
                     }
                     steps {
-                        sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                        sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                         sh 'node external-scanner/scanner/main.js'
                         archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
                     }
@@ -199,7 +223,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
             }
@@ -255,7 +279,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
             }
@@ -371,7 +395,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true
             }
@@ -423,7 +447,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf external-scanner && git clone https://github.com/contract-Developer123/jenkins-action.git -b main external-scanner'
+                sh 'rm -rf external-scanner && git clone https://github.com/openpulsetech/jenkins-action.git -b main external-scanner'
                 sh 'node external-scanner/scanner/main.js'
                 archiveArtifacts artifacts: 'scan-report/*.json', allowEmptyArchive: true, fingerprint: true
             }
