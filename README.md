@@ -17,8 +17,8 @@ Before using this integration, you need to:
 
 1. **Sign up for NeoTrack**: Create an account at [NeoTrack Platform](https://beta.neoTrak.io)
 2. **Obtain API Credentials**: Get your `NT_API_KEY` and `NT_SECRET_KEY` from the NeoTrack dashboard
-3. **Jenkins Server**: Jenkins server with Docker support
-4. **Docker Image**: `neotrak/sbom-base:1.0.5` (contains cdxgen, Trivy, and Gitleaks pre-installed)
+3. **Jenkins Server**: Jenkins server with **Docker** support
+4. **Docker Image**: `neotrak/sbom-base:1.0.5` 
 
 ## Quick Start
 
