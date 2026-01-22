@@ -60,8 +60,65 @@ try {
   if (debug) {
     console.log('\nSBOM scan completed successfully!');
   }
+
+  // Validate SBOM file exists
+  if (!fs.existsSync(cdxgenOutputFile)) {
+    console.error(`❌ Error: SBOM file was not created at ${cdxgenOutputFile}`);
+    process.exit(1);
+  }
+
+  // Validate SBOM file is not empty
+  const fileStats = fs.statSync(cdxgenOutputFile);
+  if (fileStats.size === 0) {
+    console.error(`❌ Error: SBOM file is empty at ${cdxgenOutputFile}`);
+    process.exit(1);
+  }
+
+  // Validate SBOM file contains valid JSON
+  let sbomData;
+  try {
+    const sbomContent = fs.readFileSync(cdxgenOutputFile, 'utf8');
+    sbomData = JSON.parse(sbomContent);
+  } catch (parseError) {
+    console.error(`❌ Error: SBOM file contains invalid JSON - ${parseError.message}`);
+    process.exit(1);
+  }
+
+  // Validate SBOM has required CycloneDX structure
+  if (sbomData.bomFormat !== 'CycloneDX') {
+    console.error(`❌ Error: Invalid SBOM file - missing or incorrect bomFormat (expected "CycloneDX", got "${sbomData.bomFormat}")`);
+    process.exit(1);
+  }
+
+  if (!sbomData.specVersion) {
+    console.error('❌ Error: Invalid SBOM file - missing specVersion field');
+    process.exit(1);
+  }
+
+  if (sbomData.components === undefined || sbomData.components === null) {
+    console.error('❌ Error: Invalid SBOM file - missing components field');
+    console.error('   The SBOM must contain a components array to be valid for scanning');
+    process.exit(1);
+  }
+
+  if (!Array.isArray(sbomData.components)) {
+    console.error('❌ Error: Invalid SBOM file - components must be an array');
+    process.exit(1);
+  }
+
+  if (sbomData.components.length === 0) {
+    console.error('❌ Error: Invalid SBOM file - components array is empty');
+    console.error('   No dependencies or components found in the project');
+    process.exit(1);
+  }
+
+  console.log(`✓ SBOM file validated successfully: ${cdxgenOutputFile}`);
+  console.log(`  - Size: ${fileStats.size} bytes`);
+  console.log(`  - Format: ${sbomData.bomFormat} (version ${sbomData.specVersion})`);
+  console.log(`  - Components: ${sbomData.components.length}`);
+
 } catch (error) {
-  console.error('Error during SBOM scan:', error.message);
+  console.error('❌ Error during SBOM scan:', error.message);
   process.exit(1);
 }
 
