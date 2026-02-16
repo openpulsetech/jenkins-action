@@ -15,7 +15,7 @@ A comprehensive security scanning Jenkins CI/CD integration that performs vulner
 
 Before using this integration, you need to:
 
-1. **Sign up for NeoTrack**: Create an account at [NeoTrack Platform](https://beta.neoTrak.io)
+1. **Sign up for NeoTrack**: Create an account at [NeoTrack Platform](https://app.neoTrak.io)
 2. **Obtain API Credentials**: Get your `NT_API_KEY` and `NT_SECRET_KEY` from the NeoTrack dashboard
 3. **Jenkins Server**: Jenkins server with Docker support
 4. **Docker Image**: `neotrak/neotrak-engine-base:1.0.1` (contains cdxgen, Trivy, Gitleaks, and the scanner pre-installed)
@@ -66,7 +66,7 @@ Add the following credentials in Jenkins by following these steps:
 - The credential IDs (`NT_API_KEY` and `NT_SECRET_KEY`) must match exactly as shown above
 - These credentials will be automatically injected into your pipeline through the `credentials()` function
 - Never commit these credentials to your repository
-- To obtain your API keys, log in to your NeoTrack account at [beta.neoTrak.io](https://beta.neoTrak.io)
+- To obtain your API keys, log in to your NeoTrack account at [app.neoTrak.io](https://app.neoTrak.io)
 
 ### Configuration Parameters
 
@@ -494,7 +494,7 @@ Scan results are available in multiple locations:
 
 1. **Jenkins Console Output**: View detailed results in the build console logs
 2. **Jenkins Artifacts**: Download detailed reports from build artifacts (`scan-report/` directory)
-3. **NeoTrack Dashboard**: Centralized view of all scans at [https://beta.neoTrak.io](https://beta.neoTrak.io)
+3. **NeoTrack Dashboard**: Centralized view of all scans at [https://app.neoTrak.io](https://app.neoTrak.io)
 4. **Build Trends**: Track security trends across builds in Jenkins
 
 ### Scan Reports Generated
@@ -545,7 +545,7 @@ docker run --rm neotrak/neotrak-engine-base:1.0.1 sh -c "cdxgen --version && tri
 
 | Feature | Benefit |
 |---------|---------|
-| **Centralized Dashboard** | Track security trends, compare projects, view all scans in one place at [beta.neoTrak.io](https://beta.neoTrak.io) |
+| **Centralized Dashboard** | Track security trends, compare projects, view all scans in one place at [app.neoTrak.io](https://app.neoTrak.io) |
 | **Comprehensive Scanning** | Multi-engine approach covers vulnerabilities, misconfigurations, secrets, and generates SBOM |
 | **Flexible Configuration** | Control failure conditions, severity thresholds, and scan scope per pipeline |
 | **Jenkins Integration** | Seamless CI/CD integration, automatic artifact archiving, build trend tracking |
@@ -558,7 +558,7 @@ The scanner includes a custom Gitleaks configuration file (`gitleaks-custom-rule
 
 ## Support
 
-- **Documentation**: [NeoTrack Documentation](https://beta.neoTrak.io/docs)
+- **Documentation**: [NeoTrack Documentation](https://app.neoTrak.io/docs)
 - **Issues**: [GitHub Issues](https://github.com/neotrak/jenkins-action/issues)
 - **Email**: support@neotrak.io
 

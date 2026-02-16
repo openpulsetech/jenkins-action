@@ -174,7 +174,7 @@ try {
 (async () => {
   try {
     // Get API URL from environment variable with fallback to default
-    const apiUrl = process.env.NT_API_ENDPOINT || 'https://beta.neoTrak.io';
+    const apiUrl = process.env.NT_API_ENDPOINT || 'https://app.neoTrak.io';
 
     console.log(`API URL: ${apiUrl}`);
 
