@@ -353,6 +353,7 @@ function getRepoAndBranchInfo() {
   // Get branch name from Jenkins environment and clean it
   const rawBranchName = process.env.GIT_BRANCH || process.env.BRANCH_NAME;
   const branchName = cleanBranchName(rawBranchName);
+  const username = process.env.BUILD_USER || process.env.BUILD_USER_ID || null;
 
   debugLog(`\n🔍 Repository Detection:`);
   debugLog(`  Git URL: ${gitUrl || 'NOT SET'}`);
@@ -360,8 +361,9 @@ function getRepoAndBranchInfo() {
   debugLog(`  Repo Name: ${repoName || 'NOT SET'}`);
   debugLog(`  Raw Branch: ${rawBranchName || 'NOT SET'}`);
   debugLog(`  Cleaned Branch: ${branchName || 'NOT SET'}`);
+  debugLog(`  username: ${username || 'NOT SET'}`);
 
-  return { repoName, branchName, provider };
+  return { repoName, branchName, provider, username };
 }
 
 /**
@@ -393,16 +395,18 @@ function sendToAPI(reports, apiUrl, options = {}) {
     const scannerSecretResponse = transformSecretScanResponse(reports.gitleaks);
 
     // Get repo and branch information from Jenkins environment (with GitHub/GitLab detection)
-    const { repoName, branchName, provider } = getRepoAndBranchInfo();
+    const { repoName, branchName, provider, username } = getRepoAndBranchInfo();
 
     console.log(`\n📦 Repository Info: ${repoName || 'Unknown'} (${provider || 'unknown'})`);
     console.log(`🌿 Branch: ${branchName || 'Unknown'}`);
+    console.log(`👤 Username: ${username || 'Unknown'}`);
 
     const combinedScanRequest = {
       configScanResponseDto,
       scannerSecretResponse,
       repoName: repoName || null,
-      branchName: branchName || null
+      branchName: branchName || null,
+      username: username || null
     };
 
     // Always show summary counts
